@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -8,25 +11,82 @@
 
 <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="homer.vkusmir.HelloController">
    <children>
-      <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0" style="-fx-background-color: #fff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane fx:id="mainStartPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0" style="-fx-background-color: #fff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <ImageView fitHeight="228.0" fitWidth="199.0" layoutX="96.0" layoutY="180.0" onMouseClicked="#startOrder" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="228.0" fitWidth="199.0" layoutX="96.0" layoutY="180.0" onMouseClicked="#openMainOrderPaneFromStart" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@btns/start/Заказ.jpeg" />
+                  <Image url="@img/btns/start/Заказ.jpeg" />
                </image>
             </ImageView>
-            <ImageView fitHeight="232.0" fitWidth="311.0" layoutX="432.0" layoutY="175.0" onMouseClicked="#startKitchen" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="232.0" fitWidth="311.0" layoutX="432.0" layoutY="175.0" onMouseClicked="#openMainKitchenPaneFromStart" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@btns/start/Кухня.jpeg" />
+                  <Image url="@img/btns/start/Кухня.jpeg" />
                </image>
             </ImageView>
-            <Text fx:id="helloText" layoutX="251.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Добро пожаловать!">
+            <Text layoutX="251.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Добро пожаловать!">
                <font>
                   <Font name="Apple SD Gothic Neo Regular" size="35.0" />
                </font>
             </Text>
-            <Text layoutX="566.0" layoutY="455.0" onMouseClicked="#startKitchen" strokeType="OUTSIDE" strokeWidth="0.0" text="Кухня" />
-            <Text layoutX="158.0" layoutY="455.0" onMouseClicked="#startOrder" strokeType="OUTSIDE" strokeWidth="0.0" text="Стол заказов" />
+            <Text layoutX="557.0" layoutY="448.0" onMouseClicked="#openMainKitchenPaneFromStart" strokeType="OUTSIDE" strokeWidth="0.0" text="Кухня">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Text>
+            <Text layoutX="137.0" layoutY="449.0" onMouseClicked="#openMainOrderPaneFromStart" strokeType="OUTSIDE" strokeWidth="0.0" text="Стол заказов">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Text>
          </children></AnchorPane>
+      <AnchorPane fx:id="mainKitchenPane" prefHeight="550.0" prefWidth="800.0" visible="false">
+         <children>
+            <MenuButton layoutX="47.0" layoutY="39.0" mnemonicParsing="false" text="Меню">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#openStartPaneFromMainKitchen" text="Назад" />
+                <MenuItem mnemonicParsing="false" text="Action 2" />
+              </items>
+            </MenuButton>
+            <Text layoutX="283.0" layoutY="279.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Здесь я напишу если мне что-то придёт" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="mainOrderPane" prefHeight="550.0" prefWidth="800.0" visible="false">
+         <children>
+            <Button layoutX="56.0" layoutY="41.0" mnemonicParsing="false" onAction="#openStartPaneFromMainOrder" prefHeight="38.0" prefWidth="73.0" text="Назад" />
+            <Button defaultButton="true" layoutX="323.0" layoutY="240.0" mnemonicParsing="false" onAction="#openOrderPaneFromMainOrder" prefHeight="71.0" prefWidth="156.0" text="Новый заказ">
+               <font>
+                  <Font name="Damascus Regular" size="21.0" />
+               </font>
+            </Button>
+            <Button layoutX="88.0" layoutY="249.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="139.0" text="Редактировать меню" />
+            <Button layoutX="567.0" layoutY="249.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="156.0" text="Получить статистику" />
+            <Text layoutX="318.0" layoutY="103.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Стол заказов" wrappingWidth="167.07545985901277">
+               <font>
+                  <Font name="Mishafi Gold Regular" size="28.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="orderCategoriesPane" prefHeight="550.0" prefWidth="800.0" visible="false">
+         <children>
+            <ImageView fitHeight="145.0" fitWidth="171.0" layoutX="81.0" layoutY="125.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@img/btns/mainOrder/Мясо.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="211.0" fitWidth="353.0" layoutX="199.0" layoutY="285.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@img/btns/mainOrder/Шашлык.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="224.0" fitWidth="96.0" layoutX="577.0" layoutY="110.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@img/btns/mainOrder/Шаурма.png" />
+               </image>
+            </ImageView>
+            <Button layoutX="39.0" layoutY="34.0" mnemonicParsing="false" onAction="#openMainOrderPainFromOrder" prefHeight="24.0" prefWidth="87.0" text="Назад" />
+            <Button defaultButton="true" layoutX="625.0" layoutY="33.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="130.0" text="Завершить" />
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>
