@@ -10,6 +10,8 @@ version '1.0-SNAPSHOT'
 
 mainClassName = 'homer.vkusmir.Application'
 
+//configurations.implementation.setCanBeResolved(true)
+
 repositories {
     mavenCentral()
 }
@@ -31,12 +33,19 @@ application {
 }
 
 javafx {
-    version = '19-ea+7'
-    modules = ['javafx.controls', 'javafx.fxml']
+    version = '19.0.2.1'
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics']
 }
 
 dependencies {
-
+    implementation 'org.openjfx:javafx-base:19.0.2.1'
+    implementation 'org.openjfx:javafx-controls:19.0.2.1'
+    implementation 'org.openjfx:javafx-graphics:19.0.2.1'
+    implementation 'org.openjfx:javafx:19.0.2.1'
+    implementation 'org.openjfx:javafx-fxml:19.0.2.1'
+    implementation 'org.openjfx:javafx-swing:19.0.2.1'
+    implementation 'org.openjfx:javafx-media:19.0.2.1'
+    implementation 'org.openjfx:javafx-web:19.0.2.1'
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
@@ -53,15 +62,30 @@ jlink {
     }
 }
 
+
 jlinkZip {
     group = 'distribution'
 }
 
+task copyAllDependencies(type: Copy) {
+    from configurations.compileClasspath
+    into "${buildDir}/output/libs"
+}
+build.dependsOn(copyAllDependencies)
+
 jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     manifest {
         attributes(
-                'Main-Class': 'homer.vkusmir.Application'
+                'Main-Class': 'homer.vkusmir.Application',
+                "Class-Path": '.'
         )
     }
-}
 
+//    from {
+//        configurations.implementation.collect {
+//            it.isDirectory() ? it : zipTree(it)
+//        }
+//    }
+}

@@ -1,17 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="homer.vkusmir.HelloController">
+<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="homer.vkusmir.HelloController">
    <children>
-      <AnchorPane prefHeight="600.0" prefWidth="900.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      <AnchorPane prefHeight="600.0" prefWidth="900.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      <AnchorPane prefHeight="600.0" prefWidth="900.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0" style="-fx-background-color: #fff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Button defaultButton="true" layoutX="408.0" layoutY="280.0" mnemonicParsing="false" onAction="#plus_click" prefHeight="36.0" prefWidth="78.0" text="++" />
-            <TextField fx:id="myString" disable="true" layoutX="372.0" layoutY="155.0" text="Нажатий: 0" />
+            <ImageView fitHeight="228.0" fitWidth="199.0" layoutX="96.0" layoutY="180.0" onMouseClicked="#startOrder" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@btns/start/Заказ.jpeg" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="232.0" fitWidth="311.0" layoutX="432.0" layoutY="175.0" onMouseClicked="#startKitchen" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@btns/start/Кухня.jpeg" />
+               </image>
+            </ImageView>
+            <Text fx:id="helloText" layoutX="251.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Добро пожаловать!">
+               <font>
+                  <Font name="Apple SD Gothic Neo Regular" size="35.0" />
+               </font>
+            </Text>
+            <Text layoutX="566.0" layoutY="455.0" onMouseClicked="#startKitchen" strokeType="OUTSIDE" strokeWidth="0.0" text="Кухня" />
+            <Text layoutX="158.0" layoutY="455.0" onMouseClicked="#startOrder" strokeType="OUTSIDE" strokeWidth="0.0" text="Стол заказов" />
          </children></AnchorPane>
    </children>
 </AnchorPane>

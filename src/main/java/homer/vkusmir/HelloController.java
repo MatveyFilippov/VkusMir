@@ -1,21 +1,22 @@
 package homer.vkusmir;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
 
 public class HelloController {
 
-    private int score = 0;
+    @FXML
+    private Text helloText;
 
     @FXML
-    private TextField myString;
+    void startKitchen(MouseEvent event) {
+        helloText.setText("Кухня");
+    }
 
     @FXML
-    void plus_click(ActionEvent event) {
-        score++;
-        String text = "Нажатий: " + score;
-        myString.setText(text);
+    void startOrder(MouseEvent event) {
+        helloText.setText("Заказ");
     }
 
 }
