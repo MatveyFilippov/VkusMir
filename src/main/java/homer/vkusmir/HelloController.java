@@ -4,7 +4,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
 
 public class HelloController {
 
@@ -13,7 +12,7 @@ public class HelloController {
 
 
     @FXML
-    void openMainKitchenPaneFromStart(MouseEvent event) {
+    void openMainKitchenPaneFromStart(MouseEvent event) throws Exception {
         ControlHelper.switchPane(mainStartPane, mainKitchenPane);
     }
 
@@ -40,6 +39,14 @@ public class HelloController {
     @FXML
     void openStartPaneFromMainKitchen(ActionEvent event) {
         ControlHelper.switchPane(mainKitchenPane, mainStartPane);
+    }
+
+    @FXML
+    void getLogIfFiveClicked(MouseEvent event) {
+        if (ControlHelper.canReturnLog()) {
+            ControlHelper.alreadyGetLog = true;
+            System.out.println("Вернул лог!");  // TODO: paste some secret task
+        }
     }
 
 }

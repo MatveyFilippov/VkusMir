@@ -23,7 +23,7 @@
                   <Image url="@img/btns/start/Кухня.jpeg" />
                </image>
             </ImageView>
-            <Text layoutX="251.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Добро пожаловать!">
+            <Text layoutX="251.0" layoutY="101.0" onMouseClicked="#getLogIfFiveClicked" strokeType="OUTSIDE" strokeWidth="0.0" text="Добро пожаловать!">
                <font>
                   <Font name="Apple SD Gothic Neo Regular" size="35.0" />
                </font>
