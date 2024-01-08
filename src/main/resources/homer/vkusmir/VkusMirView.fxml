@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="homer.vkusmir.HelloController">
+<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="homer.vkusmir.AppController">
    <children>
       <AnchorPane fx:id="mainStartPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0" style="-fx-background-color: #fff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -23,7 +23,7 @@
                   <Image url="@img/btns/start/Кухня.jpeg" />
                </image>
             </ImageView>
-            <Text layoutX="251.0" layoutY="101.0" onMouseClicked="#getLogIfFiveClicked" strokeType="OUTSIDE" strokeWidth="0.0" text="Добро пожаловать!">
+            <Text layoutX="251.0" layoutY="101.0" onMouseClicked="#runSecretTask" strokeType="OUTSIDE" strokeWidth="0.0" text="Добро пожаловать!">
                <font>
                   <Font name="Apple SD Gothic Neo Regular" size="35.0" />
                </font>
@@ -47,7 +47,7 @@
                 <MenuItem mnemonicParsing="false" text="Action 2" />
               </items>
             </MenuButton>
-            <Text layoutX="283.0" layoutY="279.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Здесь я напишу если мне что-то придёт" />
+            <Text fx:id="tempKitchenOutput" layoutX="283.0" layoutY="279.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Здесь я напишу если мне что-то придёт" />
          </children>
       </AnchorPane>
       <AnchorPane fx:id="mainOrderPane" prefHeight="550.0" prefWidth="800.0" visible="false">
@@ -69,17 +69,17 @@
       </AnchorPane>
       <AnchorPane fx:id="orderCategoriesPane" prefHeight="550.0" prefWidth="800.0" visible="false">
          <children>
-            <ImageView fitHeight="145.0" fitWidth="171.0" layoutX="81.0" layoutY="125.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="145.0" fitWidth="171.0" layoutX="81.0" layoutY="125.0" onMouseClicked="#orderMeetCategory" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@img/btns/mainOrder/Мясо.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="211.0" fitWidth="353.0" layoutX="199.0" layoutY="285.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="211.0" fitWidth="353.0" layoutX="199.0" layoutY="285.0" onMouseClicked="#orderFriedCategory" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@img/btns/mainOrder/Шашлык.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="224.0" fitWidth="96.0" layoutX="577.0" layoutY="110.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="224.0" fitWidth="96.0" layoutX="577.0" layoutY="110.0" onMouseClicked="#orderFoodCategory" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@img/btns/mainOrder/Шаурма.png" />
                </image>
