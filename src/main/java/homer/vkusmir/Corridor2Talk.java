@@ -5,6 +5,7 @@ import javafx.scene.text.Text;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class Corridor2Talk {
@@ -12,12 +13,14 @@ public class Corridor2Talk {
     private static Thread listenOrdersThread = null;
     public static ServerSocket serverSocket;
     private static Text tempTextArea;
+    private static final ArrayList<String> ips = VkusMirConfig.getIpsList();
 
     public static void initKitchen(Text tmp) throws IOException {
         tempTextArea = tmp;
         while (true) {
             try {
                 serverSocket = new ServerSocket(port);
+                tempTextArea.setText(serverSocket.toString());
                 startWaitingOrders();
                 break;
             } catch (IOException ex) {
@@ -77,17 +80,22 @@ public class Corridor2Talk {
         }
     }
 
-    public static void sendOrder(Map<String, String> orderMap) throws IOException {
+    public static void sendOrder(Map<String, String> orderMap) {
         if (orderMap.size() == 0) {
             return;
         }
 
-        Socket clientSocket = new Socket("localhost", port);
+        for (String host : ips) {
+            try (Socket clientSocket = new Socket(host, port)) {
+                OutputStream outputStream = clientSocket.getOutputStream();
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+                objectOutputStream.writeObject(orderMap);
+                break;
+            } catch (Exception ex) {
+                // pass
+            }
+        }
 
-        OutputStream outputStream = clientSocket.getOutputStream();
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-        objectOutputStream.writeObject(orderMap);
-
-        clientSocket.close();
+        // TODO: create mark that you don't send and throw Exception
     }
 }

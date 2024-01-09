@@ -14,6 +14,7 @@ public class Application extends javafx.application.Application {
     @Override
     public void start(Stage stage) throws IOException {
         Thread.setDefaultUncaughtExceptionHandler(Application::logError);
+        VkusMirConfig.readIniFile("Datas4VkusMirApp/VkusMirProperties.ini");
 
         FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("VkusMirView.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 800, 550);

@@ -63,21 +63,21 @@ public class AppController {
     }
 
     @FXML
-    void orderFoodCategory(MouseEvent event) throws IOException {
+    void orderFoodCategory(MouseEvent event) {
         Map<String, String> data = new HashMap<>();
         data.put("name", "Шаурма");
         Corridor2Talk.sendOrder(data);
     }
 
     @FXML
-    void orderFriedCategory(MouseEvent event) throws IOException {
+    void orderFriedCategory(MouseEvent event) {
         Map<String, String> data = new HashMap<>();
         data.put("name", "Шашлык");
         Corridor2Talk.sendOrder(data);
     }
 
     @FXML
-    void orderMeetCategory(MouseEvent event) throws IOException {
+    void orderMeetCategory(MouseEvent event) {
         Map<String, String> data = new HashMap<>();
         data.put("name", "Маринованное");
         Corridor2Talk.sendOrder(data);
