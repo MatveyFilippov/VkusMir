@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class Corridor2Talk {
-    private static int port = 1212;
+    private static final int port = 1212;
     private static Thread listenOrdersThread = null;
     public static ServerSocket serverSocket;
     private static Text tempTextArea;
@@ -17,19 +17,8 @@ public class Corridor2Talk {
 
     public static void initKitchen(Text tmp) throws IOException {
         tempTextArea = tmp;
-        while (true) {
-            try {
-                serverSocket = new ServerSocket(port);
-                tempTextArea.setText(serverSocket.toString());
-                startWaitingOrders();
-                break;
-            } catch (IOException ex) {
-                if (port > 9999) {
-                    throw new IOException("Can't up server");
-                }
-                port++;
-            }
-        }
+        serverSocket = new ServerSocket(port);
+        startWaitingOrders();
     }
 
     public static void killKitchen() {
@@ -80,22 +69,34 @@ public class Corridor2Talk {
         }
     }
 
-    public static void sendOrder(Map<String, String> orderMap) {
+    public static void sendOrder(Map<String, String> orderMap) throws IOException {
         if (orderMap.size() == 0) {
             return;
         }
 
+        boolean isSended = false;
         for (String host : ips) {
             try (Socket clientSocket = new Socket(host, port)) {
                 OutputStream outputStream = clientSocket.getOutputStream();
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
                 objectOutputStream.writeObject(orderMap);
+                isSended = true;
                 break;
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 // pass
             }
         }
 
-        // TODO: create mark that you don't send and throw Exception
+        if (!isSended) {
+            throw new IOException("can't send order in 'Corridor2Talk.java :: sendOrder()'");
+        }
+
+//        try {
+//            Corridor2Talk.sendOrder(data);
+//        } catch (IOException ex) {
+//            ControlHelper.printErrorInApp(errorPane, errorTextArea,
+//                    "Возможно кухня не включена, ведь я не могу отправить заказ (нет сервера)\nCorridor2Talk.java :: sendOrder()");
+//            throw new IOException(ex);
+//        }
     }
 }

@@ -1,7 +1,12 @@
 package homer.vkusmir;
 
+import javafx.geometry.Insets;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.concurrent.Task;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 public class ControlHelper {
 
@@ -43,5 +48,41 @@ public class ControlHelper {
     public static void switchPane(AnchorPane toClose, AnchorPane toOpen) {
         toOpen.setVisible(true);
         toClose.setVisible(false);
+    }
+
+    public static void printErrorInApp(AnchorPane errorPane, TextArea errorTextArea, String errorText) {
+        errorPane.setVisible(true);
+        errorTextArea.setText(errorText);
+    }
+
+    public static String toRGBCode(String webColour) {
+        Color color = Color.web(webColour);
+        return String.format("#%02X%02X%02X",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255)
+        );
+    }
+
+    public static VBox getProductsVbox(String categoryName) {
+        VBox clickableList = new VBox();
+        clickableList.setPadding(new Insets(10, 10, 10, 10));
+        clickableList.setSpacing(10);
+
+        for (int i = 1; i <= 22; i++) {
+            AnchorPane clickableProduct = new AnchorPane();
+            clickableProduct.setPrefSize(725, 30);
+            clickableProduct.setStyle("-fx-border-color: black; -fx-background-color: #fffdb8;");
+
+            Label productName = new Label("     Маринованное мясо в собственном соку (синее)"+i);
+            productName.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333;");
+
+            clickableProduct.getChildren().add(productName);
+            // clickableProduct.setOnMouseClicked(e -> writeHereYourDef());
+
+            clickableList.getChildren().add(clickableProduct);
+        }
+
+        return clickableList;
     }
 }
