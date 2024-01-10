@@ -91,13 +91,7 @@ public class AppController {
     void orderFriedCategory(MouseEvent event) throws IOException {
         Map<String, String> data = new HashMap<>();
         data.put("name", "Шашлык");
-        try {
-            Corridor2Talk.sendOrder(data);
-        } catch (IOException ex) {
-            ControlHelper.printErrorInApp(errorPane, errorTextArea,
-                    "Возможно кухня не включена, ведь я не могу отправить заказ (нет сервера)\nCorridor2Talk.java :: sendOrder()");
-            throw new IOException(ex);
-        }
+        Corridor2Talk.sendOrder(data, errorPane, errorTextArea);
     }
 
     @FXML

@@ -41,6 +41,7 @@ public class VkusMirConfig {
 
         for (Map.Entry<String, Map<String, String>> section : values.entrySet()) {
             if (section.getKey().equals("IPs")) {
+                result.add(section.getValue().get("REMOTE_IPv4"));
                 for (Map.Entry<String, String> item : section.getValue().entrySet()) {
                     result.add(item.getValue());
                 }

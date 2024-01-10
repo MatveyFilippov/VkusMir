@@ -1,11 +1,15 @@
 package homer.vkusmir;
 
+import javafx.concurrent.Task;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Corridor2Talk {
@@ -69,34 +73,39 @@ public class Corridor2Talk {
         }
     }
 
-    public static void sendOrder(Map<String, String> orderMap) throws IOException {
+    public static void sendOrder(Map<String, String> orderMap, AnchorPane errorPane, TextArea errorTextArea) throws IOException {
         if (orderMap.size() == 0) {
             return;
         }
 
-        boolean isSended = false;
-        for (String host : ips) {
-            try (Socket clientSocket = new Socket(host, port)) {
-                OutputStream outputStream = clientSocket.getOutputStream();
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-                objectOutputStream.writeObject(orderMap);
-                isSended = true;
-                break;
-            } catch (IOException ex) {
-                // pass
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                boolean isSent = false;
+                for (String host : ips) {
+                    try (Socket clientSocket = new Socket(host, port)) {
+                        OutputStream outputStream = clientSocket.getOutputStream();
+                        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+                        objectOutputStream.writeObject(orderMap);
+                        isSent = true;
+                        return null;
+                    } catch (IOException ex) {
+                        // pass
+                    }
+                }
+
+                if (!isSent) {
+                    ControlHelper.printErrorInApp(errorPane, errorTextArea,
+                            "Возможно кухня не включена, ведь я не могу отправить заказ (нет сервера)\nCorridor2Talk.java :: sendOrder()");
+                    throw new IOException("can't send order in 'Corridor2Talk.java :: sendOrder()'");
+                }
+                return null;
             }
-        }
+        };
 
-        if (!isSended) {
-            throw new IOException("can't send order in 'Corridor2Talk.java :: sendOrder()'");
-        }
-
-//        try {
-//            Corridor2Talk.sendOrder(data);
-//        } catch (IOException ex) {
-//            ControlHelper.printErrorInApp(errorPane, errorTextArea,
-//                    "Возможно кухня не включена, ведь я не могу отправить заказ (нет сервера)\nCorridor2Talk.java :: sendOrder()");
-//            throw new IOException(ex);
-//        }
+        Thread thread = new Thread(task);
+        thread.setName("Sending order to kitchen");
+        thread.setDaemon(true);
+        thread.start();
     }
 }

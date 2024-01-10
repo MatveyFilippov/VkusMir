@@ -3,7 +3,6 @@ package homer.vkusmir;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
