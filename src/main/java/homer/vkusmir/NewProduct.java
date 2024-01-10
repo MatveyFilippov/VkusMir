@@ -4,6 +4,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 
+import java.io.IOException;
+
 public class NewProduct {
     public static String category = null;
     public static String type = null;
@@ -44,7 +46,8 @@ public class NewProduct {
         return true;
     }
 
-    public static void putProductInBase() {
+    public static void putProductInBase() throws IOException {
+        ProductsJson.appendNewProduct(category, type, String.valueOf(price), name);
         category = null;
         type = null;
         price = 0;

@@ -16,7 +16,7 @@ public class AppController {
     private AnchorPane mainKitchenPane, mainOrderPane, mainStartPane, orderCategoriesPane, errorPane, editMenuPane;
 
     @FXML
-    private AnchorPane orderProductsListPane;
+    private AnchorPane orderProductsListPane, sure2dellProductPane;
 
     @FXML
     private Text tempKitchenOutput, categoryNameInProductList;
@@ -29,6 +29,9 @@ public class AppController {
 
     @FXML
     private TextField createProductNameTextField, createProductPriceTextField;
+
+    @FXML
+    private TextField price2dellTextField, name2dellTextField, type2dellTextField, category2dellTextField;
 
     @FXML
     private MenuButton newProductCategoryMenuBtn, newProductTypeMenuBtn;
@@ -74,7 +77,7 @@ public class AppController {
 
     @FXML
     void runSecretTask(MouseEvent event) {
-        if (ControlHelper.canReturnLog()) {
+        if (ControlHelper.isClickedFiveTimes()) {
             ControlHelper.alreadyGetLog = true;
             System.out.println("Выполнил секретное задание!");  // TODO: create some secret task
         }
@@ -116,7 +119,11 @@ public class AppController {
 
     @FXML
     void openCategoriesPaneFromProductsList(ActionEvent event) {
-        ControlHelper.switchPane(orderProductsListPane, orderCategoriesPane);
+        if (categoryNameInProductList.getText().contains("Удалить")) {
+            ControlHelper.switchPane(orderProductsListPane, editMenuPane);
+        } else {
+            ControlHelper.switchPane(orderProductsListPane, orderCategoriesPane);
+        }
     }
 
     @FXML
@@ -185,7 +192,7 @@ public class AppController {
     }
 
     @FXML
-    void createProductButton(ActionEvent event) {
+    void createProductButton(ActionEvent event) throws IOException {
         if (NewProduct.isAllField(errorPane, errorTextArea, createProductPriceTextField, createProductNameTextField)) {
             NewProduct.putProductInBase();
             newProductTypeMenuBtn.setText("Тип");
@@ -193,6 +200,44 @@ public class AppController {
             createProductPriceTextField.setText("");
             createProductNameTextField.setText("");
         }
+    }
+
+    @FXML
+    void pressCategoryDellProduct(ActionEvent event) {
+        MenuItem clickedType = (MenuItem) event.getSource();
+        String categoryName = clickedType.getText();
+        categoryNameInProductList.setText("Удалить: " + categoryName);
+        scrollPane4Products.setContent(
+                ControlHelper.getProductsForDellVbox(categoryName, sure2dellProductPane,
+                        price2dellTextField, name2dellTextField, type2dellTextField, category2dellTextField)
+        );
+        ControlHelper.switchPane(editMenuPane, orderProductsListPane);
+    }
+
+    @FXML
+    void noDellProductBtn(ActionEvent event) {
+        price2dellTextField.setText("");
+        name2dellTextField.setText("");
+        type2dellTextField.setText("");
+        category2dellTextField.setText("");
+        sure2dellProductPane.setVisible(false);
+    }
+
+    @FXML
+    void yesDellProductBtn(ActionEvent event) throws IOException {
+        String categoryName = category2dellTextField.getText();
+        ProductsJson.delProduct(categoryName, name2dellTextField.getText());
+        
+        scrollPane4Products.setContent(
+                ControlHelper.getProductsForDellVbox(categoryName, sure2dellProductPane,
+                        price2dellTextField, name2dellTextField, type2dellTextField, category2dellTextField)
+        );
+
+        price2dellTextField.setText("");
+        name2dellTextField.setText("");
+        type2dellTextField.setText("");
+        category2dellTextField.setText("");
+        sure2dellProductPane.setVisible(false);
     }
 
 }

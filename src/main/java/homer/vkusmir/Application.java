@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class Application extends javafx.application.Application {
+    public static final String productsJsonPath = "Datas4VkusMirApp/VkusMirProducts.json";
 
     @Override
     public void start(Stage stage) throws IOException {
