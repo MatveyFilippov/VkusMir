@@ -23,13 +23,15 @@ public class NewProduct {
             return false;
         }
         try {
-            String tmpPrice = price.getText();
-            if (tmpPrice.replace(" ", "").isEmpty()) {
+            String tmpPrice = price.getText().replace(" ", "").replace(",", ".");
+            if (tmpPrice.isEmpty()) {
                 throw new Exception();
             }
             NewProduct.price = Float.parseFloat(tmpPrice);
         } catch (Exception ex) {
-            ControlHelper.printErrorInApp(errorPane, errorTextArea, "Ошибка в цене товара");
+            ControlHelper.printErrorInApp(errorPane, errorTextArea,
+                    "Ошибка в цене товара\nМожно использовать только цифры, знаки '.' и ','"
+            );
             return false;
         }
         try {
