@@ -42,6 +42,8 @@ public class AppController {
     @FXML
     private CheckBox btnCheckDeliveryInEndOrder;
 
+    private final VirtualKeyboard virtualKB = new VirtualKeyboard();
+
 
     @FXML
     void openMainKitchenPaneFromStart(MouseEvent event) throws IOException {
@@ -67,7 +69,7 @@ public class AppController {
     void openMainOrderPaneFromStart() throws IOException {
         try {
             // Corridor2Talk.initOrderTable(scrollPane4ActualOrderTable, errorPane, errorTextArea);  // TODO: paste
-            AppKeyboard.initKeyboard(virtualKeyboardPane);
+            virtualKB.initKeyboardForSimpleUsing(virtualKeyboardPane);
             ControlHelper.switchPane(mainStartPane, mainOrderPane);
         } catch (Exception ex) {  // IOException ex
             ControlHelper.printErrorInApp(errorPane, errorTextArea,
@@ -155,18 +157,22 @@ public class AppController {
 
     @FXML
     void openCategoriesPaneFromEditMenu(ActionEvent event) {
-        AppKeyboard.hideKB();
+        virtualKB.hideKB();
+        newProductTypeMenuBtn.setText("Тип");
+        newProductCategoryMenuBtn.setText("Категория");
+        createProductPriceTextField.setText("");
+        createProductNameTextField.setText("");
         ControlHelper.switchPane(editMenuPane, mainOrderPane);
     }
 
     @FXML
     void openVirtualKeyboard() {
-        AppKeyboard.showKB();
+        virtualKB.showKB();
     }
 
     @FXML
     void closeVirtualKeyboard() {
-        AppKeyboard.hideKB();
+        virtualKB.hideKB();
     }
 
     @FXML
@@ -187,7 +193,7 @@ public class AppController {
 
     @FXML
     void createProductButton(ActionEvent event) throws IOException {
-        AppKeyboard.hideKB();
+        virtualKB.hideKB();
         if (NewProduct.isAllField(errorPane, errorTextArea, createProductPriceTextField, createProductNameTextField)) {
             NewProduct.putProductInBase();
             newProductTypeMenuBtn.setText("Тип");
@@ -199,7 +205,7 @@ public class AppController {
 
     @FXML
     void pressCategoryDellProduct(ActionEvent event) {
-        AppKeyboard.hideKB();
+        virtualKB.hideKB();
         MenuItem clickedType = (MenuItem) event.getSource();
         String categoryName = clickedType.getText();
         categoryNameInProductList.setText("Удалить: " + categoryName);
@@ -354,7 +360,7 @@ public class AppController {
             deliveryAddressInEndOrder.setDisable(false);
             deliveryAddressInEndOrder.setEditable(true);
         } else {
-            AppKeyboard.hideKB();
+            virtualKB.hideKB();
             deliveryAddressInEndOrder.setText("Выдать на месте");
             deliveryAddressInEndOrder.setDisable(true);
             deliveryAddressInEndOrder.setEditable(false);

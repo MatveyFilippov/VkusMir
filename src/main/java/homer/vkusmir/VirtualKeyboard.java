@@ -20,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -28,6 +29,7 @@ import java.util.Objects;
 
 public class VirtualKeyboard {
     private final VBox root ;
+    private AnchorPane keyboardPane = null;
 
     /**
      * Creates a Virtual Keyboard.
@@ -230,5 +232,21 @@ public class VirtualKeyboard {
         public void releaseKeys() {
             shift.setSelected(false);
         }
+    }
+
+    public void initKeyboardForSimpleUsing(AnchorPane virtualKeyboardPane) {
+        if (keyboardPane == null) {
+            root.setStyle("-fx-border-color: darkblue; -fx-border-radius: 5;");
+            virtualKeyboardPane.getChildren().add(root);
+            keyboardPane = virtualKeyboardPane;
+        }
+    }
+
+    public void showKB() {
+        keyboardPane.setVisible(true);
+    }
+
+    public void hideKB() {
+        keyboardPane.setVisible(false);
     }
 }
