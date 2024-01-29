@@ -15,6 +15,8 @@ public class ProductsJson {
     public static final String miscCategoryFood = "Прочее";
     public static final String typeKeyFood = "Тип";
     public static final String priceKeyFood = "Стоимость";
+    public static boolean isSomethingNew4Adding = true;
+    public static boolean isSomethingNew4Deleting = true;
 
     private static String readFile() {
         String content;
@@ -38,6 +40,8 @@ public class ProductsJson {
                 throw new IOException("can't write data to json; ProductsJson.java :: writeToFile()");
             }
         }
+        isSomethingNew4Adding = true;
+        isSomethingNew4Deleting = true;
     }
 
     private static void refreshCategory(String categoryName, JSONObject jsonCategory) throws IOException {

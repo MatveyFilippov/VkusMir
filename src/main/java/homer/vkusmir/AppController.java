@@ -4,11 +4,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AppController {
 
@@ -19,13 +21,22 @@ public class AppController {
     private AnchorPane orderProductsListPane, sure2dellProductPane, addProductInOrderPane, endOrderPane, virtualKeyboardPane;
 
     @FXML
+    private AnchorPane sure2DellPositionPane, lookWrittenOrderPane;
+
+    @FXML
     private Text categoryNameInProductList, typeOfProductInAddOrder, priceOfProductInAddOrder, finalPriceInEndOrder;
+
+    @FXML
+    private Text yesDellPositionInOrder;
 
     @FXML
     private TextArea errorTextArea;
 
     @FXML
     private ScrollPane scrollPane4Products, scrollPane4ActualOrderTable, scrollPane4DoneOrderTable, scrollPane4EndOrder;
+
+    @FXML
+    private ScrollPane orderPositionsInKitchenLook;
 
     @FXML
     private TextField createProductNameTextField, createProductPriceTextField, name2addInOrderTextField;
@@ -37,12 +48,19 @@ public class AppController {
     private TextField price2addInOrderTextField, score2addInOrderTextField, deliveryAddressInEndOrder;
 
     @FXML
+    private TextField addressInDoneOrder, position2dellTextField, orderNumInKitchenLook, priceInDoneOrder;
+
+    @FXML
     private MenuButton newProductCategoryMenuBtn, newProductTypeMenuBtn;
 
     @FXML
     private CheckBox btnCheckDeliveryInEndOrder;
 
+    @FXML
+    private Button orderIsDoneKitchenLook;
+
     private final VirtualKeyboard virtualKB = new VirtualKeyboard();
+    private Map<String, Map<String, VBox>> vboxes = new HashMap<>();
 
 
     @FXML
@@ -69,6 +87,18 @@ public class AppController {
     void openMainOrderPaneFromStart() throws IOException {
         try {
             // Corridor2Talk.initOrderTable(scrollPane4ActualOrderTable, errorPane, errorTextArea);  // TODO: paste
+//            while (true) {
+//                ControlHelper.fillOrdersVboxForKitchen(scrollPane4ActualOrderTable, OrdersJson.inProcessKey, false);
+//                fillListWithProducts2Dell(ProductsJson.grillCategoryFood);
+//                fillListWithProductsInOrder(ProductsJson.breadCategoryFood);
+//                fillListWithProducts2Dell(ProductsJson.meetCategoryFood);
+//                fillListWithProductsInOrder(ProductsJson.miscCategoryFood);
+//            }
+            ControlHelper.fillOrdersVboxForKitchen(
+                    lookWrittenOrderPane, scrollPane4ActualOrderTable, OrdersJson.inProcessKey, false,
+                    orderNumInKitchenLook, orderIsDoneKitchenLook, addressInDoneOrder, priceInDoneOrder,
+                    orderPositionsInKitchenLook
+            );
             virtualKB.initKeyboardForSimpleUsing(virtualKeyboardPane);
             ControlHelper.switchPane(mainStartPane, mainOrderPane);
         } catch (Exception ex) {  // IOException ex
@@ -79,7 +109,7 @@ public class AppController {
     }
 
     @FXML
-    void openOrderPaneFromMainOrder(ActionEvent event) {
+    void openOrderPaneFromMainOrder() {
         Order.newOrder();
         ControlHelper.switchPane(mainOrderPane, orderCategoriesPane);
     }
@@ -104,45 +134,61 @@ public class AppController {
         }
     }
 
-    void orderOpenListWithProducts(String category) {
+    private void fillListWithProductsInOrder(String category) {
+        scrollPane4Products.setContent(null);
+        String key4vbox = "order";
+        if (!vboxes.containsKey(key4vbox)) {
+            Map<String, VBox> tmp = new HashMap<>();
+            vboxes.put(key4vbox, tmp);
+            ProductsJson.isSomethingNew4Adding = true;
+        }
+        if (ProductsJson.isSomethingNew4Adding || !vboxes.get(key4vbox).containsKey(category)) {
+            String[] categories = {
+                    ProductsJson.breadCategoryFood, ProductsJson.grillCategoryFood,
+                    ProductsJson.miscCategoryFood, ProductsJson.meetCategoryFood
+            };
+            for (String c : categories) {
+                vboxes.get(key4vbox).put(
+                        c, ControlHelper.getProductsVboxForOrder(
+                                c, addProductInOrderPane, typeOfProductInAddOrder, priceOfProductInAddOrder, name2addInOrderTextField
+                        )
+                );
+            }
+            ProductsJson.isSomethingNew4Adding = false;
+        }
         categoryNameInProductList.setText(category);
-        scrollPane4Products.setContent(
-                ControlHelper.getProductsVboxForOrder(
-                        category, addProductInOrderPane, typeOfProductInAddOrder, priceOfProductInAddOrder,
-                        name2addInOrderTextField
-                )
-        );
+        scrollPane4Products.setContent(vboxes.get(key4vbox).get(category));
         ControlHelper.switchPane(orderCategoriesPane, orderProductsListPane);
     }
 
     @FXML
-    void orderFoodCategory(MouseEvent event) {
-        orderOpenListWithProducts(ProductsJson.breadCategoryFood);
+    void orderFoodCategory() {
+        fillListWithProductsInOrder(ProductsJson.breadCategoryFood);
     }
 
     @FXML
-    void orderFriedCategory(MouseEvent event) {
-        orderOpenListWithProducts(ProductsJson.grillCategoryFood);
+    void orderFriedCategory() {
+        fillListWithProductsInOrder(ProductsJson.grillCategoryFood);
     }
 
     @FXML
-    void orderMeetCategory(MouseEvent event) {
-        orderOpenListWithProducts(ProductsJson.meetCategoryFood);
+    void orderMeetCategory() {
+        fillListWithProductsInOrder(ProductsJson.meetCategoryFood);
     }
 
     @FXML
-    void orderMiscCategory(MouseEvent event) {
-        orderOpenListWithProducts(ProductsJson.miscCategoryFood);
+    void orderMiscCategory() {
+        fillListWithProductsInOrder(ProductsJson.miscCategoryFood);
     }
 
     @FXML
-    void closeErrorPane(ActionEvent event) {
+    void closeErrorPane() {
         errorPane.setVisible(false);
         errorTextArea.setText("");
     }
 
     @FXML
-    void openCategoriesPaneFromProductsList(ActionEvent event) {
+    void openCategoriesPaneFromProductsList() {
         if (categoryNameInProductList.getText().contains("Удалить")) {
             ControlHelper.switchPane(orderProductsListPane, editMenuPane);
         } else {
@@ -203,21 +249,43 @@ public class AppController {
         }
     }
 
+    private void fillListWithProducts2Dell(final String category) {
+        scrollPane4Products.setContent(null);
+        String key4vbox = "dell";
+        if (!vboxes.containsKey(key4vbox)) {
+            Map<String, VBox> tmp = new HashMap<>();
+            vboxes.put(key4vbox, tmp);
+            ProductsJson.isSomethingNew4Deleting = true;
+        }
+        if (ProductsJson.isSomethingNew4Deleting || !vboxes.get(key4vbox).containsKey(category)) {
+            String[] categories = {
+                    ProductsJson.breadCategoryFood, ProductsJson.grillCategoryFood,
+                    ProductsJson.miscCategoryFood, ProductsJson.meetCategoryFood
+            };
+            for (String c : categories) {
+                vboxes.get(key4vbox).put(
+                        c, ControlHelper.getProductsForDellVbox(c, sure2dellProductPane,
+                                price2dellTextField, name2dellTextField, type2dellTextField, category2dellTextField
+                        )
+                );
+            }
+            ProductsJson.isSomethingNew4Deleting = false;
+        }
+        categoryNameInProductList.setText("Удалить: " + category);
+        scrollPane4Products.setContent(vboxes.get(key4vbox).get(category));
+        ControlHelper.switchPane(orderCategoriesPane, orderProductsListPane);
+    }
+
     @FXML
     void pressCategoryDellProduct(ActionEvent event) {
         virtualKB.hideKB();
         MenuItem clickedType = (MenuItem) event.getSource();
-        String categoryName = clickedType.getText();
-        categoryNameInProductList.setText("Удалить: " + categoryName);
-        scrollPane4Products.setContent(
-                ControlHelper.getProductsForDellVbox(categoryName, sure2dellProductPane,
-                        price2dellTextField, name2dellTextField, type2dellTextField, category2dellTextField)
-        );
+        fillListWithProducts2Dell(clickedType.getText());
         ControlHelper.switchPane(editMenuPane, orderProductsListPane);
     }
 
     @FXML
-    void noDellProductBtn(ActionEvent event) {
+    void closeDellProductBtn() {
         price2dellTextField.setText("");
         name2dellTextField.setText("");
         type2dellTextField.setText("");
@@ -226,20 +294,11 @@ public class AppController {
     }
 
     @FXML
-    void yesDellProductBtn(ActionEvent event) throws IOException {
-        String categoryName = category2dellTextField.getText();
+    void yesDellProductBtn() throws IOException {
+        final String categoryName = category2dellTextField.getText();
         ProductsJson.delProduct(categoryName, name2dellTextField.getText());
-
-        scrollPane4Products.setContent(
-                ControlHelper.getProductsForDellVbox(categoryName, sure2dellProductPane,
-                        price2dellTextField, name2dellTextField, type2dellTextField, category2dellTextField)
-        );
-
-        price2dellTextField.setText("");
-        name2dellTextField.setText("");
-        type2dellTextField.setText("");
-        category2dellTextField.setText("");
-        sure2dellProductPane.setVisible(false);
+        fillListWithProducts2Dell(categoryName);
+        closeDellProductBtn();
     }
 
     @FXML
@@ -251,7 +310,9 @@ public class AppController {
         } else {
             finalPriceInEndOrder.setText("Проверьте заказ общей стоимостью: " + Order.finalPrice.toString());
             scrollPane4EndOrder.setContent(
-                    ControlHelper.getPositionsVboxForEndOrder()
+                    ControlHelper.getPositionsVboxForEndOrder(
+                            scrollPane4EndOrder, sure2DellPositionPane, position2dellTextField, yesDellPositionInOrder
+                    )
             );
             endOrderPane.setVisible(true);
         }
@@ -292,9 +353,9 @@ public class AppController {
     @FXML
     void pressPlusMinusScoreInAddOrder(ActionEvent event) {
         Button clickedNum = (Button) event.getSource();
-        String signPressed = clickedNum.getText();
-        String alreadyWritten = score2addInOrderTextField.getText();
-        String productType = typeOfProductInAddOrder.getText();
+        final String signPressed = clickedNum.getText();
+        final String alreadyWritten = score2addInOrderTextField.getText();
+        final String productType = typeOfProductInAddOrder.getText();
 
         BigDecimal actualScore = BigDecimal.ZERO;
         if (!alreadyWritten.isEmpty()) {
@@ -323,10 +384,10 @@ public class AppController {
     @FXML
     void pressNumInAddOrder(ActionEvent event) {
         Button clickedNum = (Button) event.getSource();
-        String numPressed = clickedNum.getText();
-        String alreadyWritten = score2addInOrderTextField.getText();
+        final String numPressed = clickedNum.getText();
+        final String alreadyWritten = score2addInOrderTextField.getText();
         if (!(numPressed.contains(".") && alreadyWritten.contains("."))) {
-            String actualScore = alreadyWritten + numPressed;
+            final String actualScore = alreadyWritten + numPressed;
             score2addInOrderTextField.setText(actualScore);
             BigDecimal actualPrice = new BigDecimal(actualScore).multiply(
                     new BigDecimal(priceOfProductInAddOrder.getText())
@@ -337,7 +398,7 @@ public class AppController {
 
     @FXML
     void backspaceNumPressedInAddOrder() {
-        String alreadyWritten = score2addInOrderTextField.getText();
+        final String alreadyWritten = score2addInOrderTextField.getText();
         int strLen = alreadyWritten.length();
         if (strLen != 0) {
             String actualScore = alreadyWritten.substring(0, strLen - 1);
@@ -365,5 +426,39 @@ public class AppController {
             deliveryAddressInEndOrder.setDisable(true);
             deliveryAddressInEndOrder.setEditable(false);
         }
+    }
+
+    @FXML
+    void closePane2DellPositionInOrder() {
+        sure2DellPositionPane.setVisible(false);
+        position2dellTextField.setText("");
+    }
+
+    @FXML
+    void closeLookOrderPane() {
+        lookWrittenOrderPane.setVisible(false);
+    }
+
+    @FXML
+    void sendOrderToKitchen() {
+        String address = deliveryAddressInEndOrder.getText();
+        btnCheckDeliveryInEndOrder.setSelected(false);
+        btnDeliveryInEndOrder();
+        if (address.isEmpty()) {
+            address = "Выдать на месте";
+        }
+        try {
+            Order.sendOrder(address);
+        } catch (IOException ex) {
+            ControlHelper.printErrorInApp(errorPane, errorTextArea, "Заказ отправлен на кухню, но не записан в базу");
+        }
+        endOrderPane.setVisible(false);
+        ControlHelper.switchPane(orderCategoriesPane, mainOrderPane);
+        ControlHelper.fillOrdersVboxForKitchen(
+                lookWrittenOrderPane, scrollPane4ActualOrderTable, OrdersJson.inProcessKey, false,
+                orderNumInKitchenLook, orderIsDoneKitchenLook, addressInDoneOrder, priceInDoneOrder,
+                orderPositionsInKitchenLook
+        );
+        scrollPane4EndOrder.setContent(null);
     }
 }

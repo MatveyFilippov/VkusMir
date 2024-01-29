@@ -1,18 +1,20 @@
 package homer.vkusmir;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Map;
 
 public class Order {
-    public static String keyName = "name";
-    public static String keyPrice = "price";
-    public static String keyScore = "score";
-    public static String keyAddress= "name";
-    public static String keyNumber = "price";
-    public static String keyPositions = "score";
-    private static int orderNum = 0;
+    public static final String keyName = "name";
+    public static final String keyPrice = "price";
+    public static final String keyScore = "score";
+    public static final String keyAddress= "address";
+    public static final String keyNumber = "order_num";
+    public static final String keyPositions = "positions";
+    public static final String keyOrderPrice = "global_price";
+    private static int orderNum = OrdersJson.getLastInProcessNum();
     public static ArrayList<Map<String, String>> orderList;
     public static BigDecimal finalPrice;
 
@@ -49,15 +51,22 @@ public class Order {
     }
 
 
-    public static void sendOrder(String address) {
+    public static void sendOrder(String address) throws IOException {
         Map<String, Object> data = new HashMap<>();
         data.put(keyPositions, orderList);
         data.put(keyAddress, address);
-        data.put(keyNumber, String.valueOf(orderNum));
+        data.put(keyNumber, orderNum);
+        data.put(keyOrderPrice, finalPrice.toString());
         Corridor2Talk.sendOrder(data);
+        OrdersJson.appendNewOrder(data);
+        cleanOrder();
     }
 
-    public static void cleanOrder() {
+    public static void delPosition(Map<String, String> position) {
+        orderList.remove(position);
+    }
+
+    private static void cleanOrder() {
         orderList = null;
         finalPrice = null;
     }

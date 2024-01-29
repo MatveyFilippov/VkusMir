@@ -42,3 +42,5 @@ bin/
 .DS_Store
 /src/main/java/homer/vkusmir/PlayGround.java
 /Datas4VkusMirApp/VkusMirProducts.json
+/Datas4VkusMirApp/VkusMirOrders.json
+/src/test/
