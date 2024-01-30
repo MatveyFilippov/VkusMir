@@ -4,7 +4,6 @@ import javafx.concurrent.Task;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;

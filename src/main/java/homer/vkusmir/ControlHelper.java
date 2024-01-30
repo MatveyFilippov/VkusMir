@@ -5,23 +5,21 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.concurrent.Task;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class ControlHelper {
 
     private static int timesClickedForLog = 0;
-    public static boolean alreadyGetLog = false;
+    public static boolean alreadyShowSecretTask = false;
     private static boolean isDefActive = false;
     private static Map<String, Object> map4fillingOrders;
 
     public static boolean isClickedFiveTimes() {
-        if (alreadyGetLog) {
+        if (alreadyShowSecretTask) {
             return false;
         }
 
@@ -57,15 +55,6 @@ public class ControlHelper {
     public static void printErrorInApp(AnchorPane errorPane, TextArea errorTextArea, String errorText) {
         errorPane.setVisible(true);
         errorTextArea.setText(errorText);
-    }
-
-    public static String toRGBCode(String webColour) {
-        Color color = Color.web(webColour);
-        return String.format("#%02X%02X%02X",
-                (int) (color.getRed() * 255),
-                (int) (color.getGreen() * 255),
-                (int) (color.getBlue() * 255)
-        );
     }
 
     public static VBox getProductsVboxForOrder(String productCategory, AnchorPane addProductInOrderPane,
@@ -144,7 +133,8 @@ public class ControlHelper {
     }
 
     public static VBox getPositionsVboxForEndOrder(ScrollPane positionsPane, AnchorPane sure2dell,
-                                                   TextField position2dell, Text yesDellPosition) {
+                                                   TextField position2dell, Text yesDellPosition,
+                                                   AnchorPane endOrderPane) {
         VBox clickableList = new VBox();
         clickableList.setPadding(new Insets(10, 10, 10, 10));
         clickableList.setSpacing(10);
@@ -163,7 +153,8 @@ public class ControlHelper {
 
                 clickablePosition.getChildren().add(positionLabel);
                 clickablePosition.setOnMouseClicked(e ->
-                        def2SureDellProductInOrder(position, positionsPane, sure2dell, position2dell, yesDellPosition, positionInfo)
+                        def2SureDellProductInOrder(position, positionsPane, sure2dell, position2dell, yesDellPosition,
+                                positionInfo, endOrderPane)
                 );
                 clickableList.getChildren().add(clickablePosition);
             }
@@ -290,7 +281,6 @@ public class ControlHelper {
 
         try {
             for (String num : jsonCategory.keySet()) {
-                System.out.println(num);
                 AnchorPane clickableOrder = new AnchorPane();
                 clickableOrder.setPrefSize(125, 30);
                 clickableOrder.setStyle("-fx-border-color: black; -fx-background-color: #fffdb8;");
@@ -342,18 +332,22 @@ public class ControlHelper {
 
     private static void def2SureDellProductInOrder(Map<String, String> position, ScrollPane positionsPane,
                                                    AnchorPane sure2dell, TextField position2dell, Text yesDellPosition,
-                                                   final String positionInfo) {
+                                                   final String positionInfo, AnchorPane endOrderPane) {
         sure2dell.setVisible(true);
         position2dell.setText(positionInfo);
         yesDellPosition.setOnMouseClicked(e ->
                 {
                     Order.delPosition(position);
+                    sure2dell.setVisible(false);
+                    if (Order.isOrderNull()) {
+                        endOrderPane.setVisible(false);
+                        return;
+                    }
                     positionsPane.setContent(
                             ControlHelper.getPositionsVboxForEndOrder(
-                                    positionsPane, sure2dell, position2dell, yesDellPosition
+                                    positionsPane, sure2dell, position2dell, yesDellPosition, endOrderPane
                             )
                     );
-                    sure2dell.setVisible(false);
                     position2dell.setText("");
                 }
         );

@@ -20,7 +20,7 @@ public class AppController {
     private AnchorPane orderProductsListPane, sure2dellProductPane, addProductInOrderPane, endOrderPane, virtualKeyboardPane;
 
     @FXML
-    private AnchorPane sure2DellPositionPane, lookWrittenOrderPane, notificationPane;
+    private AnchorPane sure2DellPositionPane, lookWrittenOrderPane, notificationPane, printBluffSecretTask;
 
     @FXML
     private Text categoryNameInProductList, typeOfProductInAddOrder, priceOfProductInAddOrder, finalPriceInEndOrder;
@@ -80,7 +80,8 @@ public class AppController {
     }
 
     @FXML
-    void openMainOrderPainFromOrder() {  // TODO: если есть ордер, то переспросить
+    void openMainOrderPainFromOrder() {
+        ControlHelper.showNotification(notificationPane, notificationText, "Заказа удалён");
         Order.killOrder();
         btnCheckDeliveryInEndOrder.setSelected(false);
         btnDeliveryInEndOrder();
@@ -114,8 +115,9 @@ public class AppController {
     @FXML
     void runSecretTask() {
         if (ControlHelper.isClickedFiveTimes()) {
-            ControlHelper.alreadyGetLog = true;
-            System.out.println("Выполнил секретное задание!");  // TODO: create some secret task
+            virtualKB.initKeyboardForSimpleUsing(virtualKeyboardPane);
+            ControlHelper.alreadyShowSecretTask = true;
+            printBluffSecretTask.setVisible(true);
         }
     }
 
@@ -296,7 +298,8 @@ public class AppController {
             finalPriceInEndOrder.setText("Проверьте заказ общей стоимостью: " + Order.finalPrice.toString());
             scrollPane4EndOrder.setContent(
                     ControlHelper.getPositionsVboxForEndOrder(
-                            scrollPane4EndOrder, sure2DellPositionPane, position2dellTextField, yesDellPositionInOrder
+                            scrollPane4EndOrder, sure2DellPositionPane, position2dellTextField, yesDellPositionInOrder,
+                            endOrderPane
                     )
             );
             endOrderPane.setVisible(true);
@@ -306,6 +309,7 @@ public class AppController {
     @FXML
     void closeEndOrderPane() {
         endOrderPane.setVisible(false);
+        closePane2DellPositionInOrder();
     }
 
     @FXML
@@ -400,7 +404,7 @@ public class AppController {
     }
 
     @FXML
-    void btnDeliveryInEndOrder() {  // TODO: в других функция поставить 'btnCheckDeliveryInEndOrder.setSelected(false); btnDeliveryInEndOrder();'
+    void btnDeliveryInEndOrder() {
         if (btnCheckDeliveryInEndOrder.isSelected()) {
             deliveryAddressInEndOrder.setText("");
             deliveryAddressInEndOrder.setDisable(false);
@@ -437,7 +441,7 @@ public class AppController {
         } catch (IOException ex) {
             ControlHelper.printErrorInApp(errorPane, errorTextArea, "Заказ отправлен на кухню, но не записан в базу");
         }
-        endOrderPane.setVisible(false);
+        closeEndOrderPane();
         ControlHelper.switchPane(orderCategoriesPane, mainOrderPane);
         ControlHelper.fillOrdersVboxForOrderTable();
         scrollPane4EndOrder.setContent(null);
@@ -454,6 +458,9 @@ public class AppController {
                 ControlHelper.showNotification(notificationPane, notificationText,
                         "Заказ " + orderNum + " выполнен"
                 );
+                orderNumKitchen.setText("");
+                orderAddressKitchen.setText("");
+                orderPositionsKitchen.setContent(null);
             } else {
                 throw new Exception("can't end order in kitchen");
             }
@@ -487,5 +494,6 @@ public class AppController {
     void orderIsDoneOrderTable() throws IOException {
         OrdersJson.dellOrder(OrdersJson.readyKey, orderNumInKitchenLook.getText());
         ControlHelper.fillOrdersVboxForOrderTable();
+        lookWrittenOrderPane.setVisible(false);
     }
 }

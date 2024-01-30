@@ -1,7 +1,5 @@
 package homer.vkusmir;
 
-import javafx.fxml.FXML;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
