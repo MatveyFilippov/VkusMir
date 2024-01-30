@@ -48,15 +48,34 @@ public class OrdersJson {
         return jsonData.getJSONObject(category);
     }
 
-    public static void appendNewOrder(Map<String, Object> order) throws IOException {
+    public static void appendNewOrder(final Map<String, Object> order) throws IOException {
         JSONObject jsonCategory = getCategoryFromJson(inProcessKey);
 
-        final int orderNum = (int) order.get(Order.keyNumber);
-        order.remove(Order.keyNumber);
         JSONObject jsonOrder = new JSONObject(order);
+        jsonOrder.remove(Order.keyNumber);
 
-        jsonCategory.put(String.valueOf(orderNum), jsonOrder);
+        jsonCategory.put((String) order.get(Order.keyNumber), jsonOrder);
         refreshCategory(inProcessKey, jsonCategory);
+    }
+
+    public static void dellOrder(final String category, final String num) throws IOException {
+        JSONObject jsonCategory = getCategoryFromJson(category);
+        if (jsonCategory.has(num)) {
+            jsonCategory.remove(num);
+            refreshCategory(category, jsonCategory);
+        }
+    }
+
+    public static void changeCategory2Done(String orderNum) throws IOException {
+        JSONObject jsonData = new JSONObject(readFile());
+        JSONObject category = jsonData.getJSONObject(inProcessKey);
+        if (category.has(orderNum)) {
+            JSONObject order = category.getJSONObject(orderNum);
+            jsonData.getJSONObject(readyKey).put(orderNum, order);
+            jsonData.getJSONObject(inProcessKey).remove(orderNum);
+            writeFile(jsonData.toString());
+        }
+
     }
 
     public static int getLastInProcessNum() {

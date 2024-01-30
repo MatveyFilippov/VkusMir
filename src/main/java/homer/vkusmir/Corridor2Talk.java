@@ -1,9 +1,10 @@
 package homer.vkusmir;
 
 import javafx.concurrent.Task;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -16,9 +17,10 @@ public class Corridor2Talk {  // TODO: беда со связью при отк�
     private static Thread listenDoneOrdersThread = null;
     private static ServerSocket serverSocket;
     private static Socket clientSocket;
-    private static ScrollPane activeOrders;
     private static AnchorPane errPane;
     private static TextArea errTextArea;
+    private static Text notificationText;
+    private static AnchorPane notificationPane;
     private static final ArrayList<String> ips = VkusMirConfig.getIpsList();
 
     private static Socket getClientSocket4Kitchen() throws IOException {
@@ -32,9 +34,11 @@ public class Corridor2Talk {  // TODO: беда со связью при отк�
         throw new IOException("can't connect to kitchen in 'Corridor2Talk.java :: initOrderTable()'");
     }
 
-    public static void initKitchen(AnchorPane errorPane, TextArea errorTextArea, ScrollPane activeOrdersPane) throws IOException {
-        activeOrders = activeOrdersPane;
+    public static void initKitchen(AnchorPane errorPane, TextArea errorTextArea, Text noteText,
+                                   AnchorPane notePane) throws IOException {
         serverSocket = new ServerSocket(port);
+        notificationText = noteText;
+        notificationPane = notePane;
         errPane = errorPane;
         errTextArea = errorTextArea;
         startWaitingOrders();
@@ -52,8 +56,10 @@ public class Corridor2Talk {  // TODO: беда со связью при отк�
         System.gc();
     }
 
-    public static void initOrderTable(ScrollPane activeOrdersPane, AnchorPane errorPane, TextArea errorTextArea) throws IOException {
-        activeOrders = activeOrdersPane;
+    public static void initOrderTable(AnchorPane errorPane, TextArea errorTextArea,
+                                      Text noteText, AnchorPane notePane) throws IOException {
+        notificationText = noteText;
+        notificationPane = notePane;
         errPane = errorPane;
         errTextArea = errorTextArea;
         clientSocket = getClientSocket4Kitchen();
@@ -168,7 +174,7 @@ public class Corridor2Talk {  // TODO: беда со связью при отк�
                     ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
 
                     Map<String, Object> orderMap = (Map<String, Object>) objectInputStream.readObject();
-                    loadOrder(orderMap);
+                    processOrder(orderMap);
                 } catch (IOException | ClassNotFoundException ex) {
                     break;
                 }
@@ -189,7 +195,7 @@ public class Corridor2Talk {  // TODO: беда со связью при отк�
                     DataInputStream dataInputStream = new DataInputStream(inputStream);
 
                     String receivedOrderNum = dataInputStream.readUTF();
-                    loadDoneOrder(receivedOrderNum);
+                    processDoneOrder(receivedOrderNum);
                 } catch (IOException ex) {
                     if (listenDoneOrdersThread.isInterrupted()) {
                         listenDoneOrdersThread = null;
@@ -207,11 +213,18 @@ public class Corridor2Talk {  // TODO: беда со связью при отк�
         }
     }
 
-    private static void loadOrder(Map<String, Object>  order) {
-        System.out.println(order);
+    private static void processOrder(Map<String, Object>  order) throws IOException {
+        OrdersJson.appendNewOrder(order);
+        ControlHelper.showNotification(notificationPane, notificationText,
+                "Новый заказ -> " + order.get(Order.keyNumber)
+        );
     }
 
-    private static void loadDoneOrder(String doneOrderNum) {
-        // TODO: вставить обработку
+    private static void processDoneOrder(String orderNum) throws IOException {
+        OrdersJson.changeCategory2Done(orderNum);
+        ControlHelper.fillOrdersVboxForOrderTable();
+        ControlHelper.showNotification(notificationPane, notificationText,
+                "Заказ " + orderNum + " выполнен"
+        );
     }
 }

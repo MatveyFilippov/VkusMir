@@ -9,15 +9,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.HashMap;
 import java.util.Map;
 
 public class ControlHelper {
 
     private static int timesClickedForLog = 0;
-
     public static boolean alreadyGetLog = false;
-
     private static boolean isDefActive = false;
+    private static Map<String, Object> map4fillingOrders;
 
     public static boolean isClickedFiveTimes() {
         if (alreadyGetLog) {
@@ -173,21 +174,52 @@ public class ControlHelper {
         }
     }
 
-    public static void fillOrdersVboxForKitchen(AnchorPane lookOrderPane, ScrollPane scrollPane, final String category,
-                                                boolean closeable, TextField orderNumText, Button doneBtn,
-                                                TextField addressField, TextField priceField, ScrollPane positions) {
-        scrollPane.setContent(null);
-        scrollPane.setContent(
-                ControlHelper.getOrdersVboxForKitchen(
-                        OrdersJson.getCategoryFromJson(category), closeable, lookOrderPane, orderNumText, doneBtn,
-                        addressField, priceField, positions
+    public static void initAndFillOrdersVboxForOrderTable(AnchorPane lookOrderPane, ScrollPane scrollPaneProcess,
+                                                          ScrollPane scrollPaneDone, TextField orderNumText, Button doneBtn,
+                                                          TextField addressField, TextField priceField, ScrollPane positions) {
+        map4fillingOrders = null;
+        map4fillingOrders = new HashMap<>();
+        map4fillingOrders.put("lookOrderPane", lookOrderPane);
+        map4fillingOrders.put("scrollPaneProcess", scrollPaneProcess);
+        map4fillingOrders.put("scrollPaneDone", scrollPaneDone);
+        map4fillingOrders.put("orderNumText", orderNumText);
+        map4fillingOrders.put("doneBtn", doneBtn);
+        map4fillingOrders.put("addressField", addressField);
+        map4fillingOrders.put("priceField", priceField);
+        map4fillingOrders.put("positions", positions);
+        fillOrdersVboxForOrderTable();
+    }
+
+    public static void fillOrdersVboxForOrderTable() {
+        AnchorPane lookOrderPane = (AnchorPane) map4fillingOrders.get("lookOrderPane");
+        ScrollPane scrollPaneProcess = (ScrollPane) map4fillingOrders.get("scrollPaneProcess");
+        ScrollPane scrollPaneDone = (ScrollPane) map4fillingOrders.get("scrollPaneDone");
+        ScrollPane positions = (ScrollPane) map4fillingOrders.get("positions");
+        TextField orderNumText = (TextField) map4fillingOrders.get("orderNumText");
+        TextField addressField = (TextField) map4fillingOrders.get("addressField");
+        TextField priceField = (TextField) map4fillingOrders.get("priceField");
+        Button doneBtn = (Button) map4fillingOrders.get("doneBtn");
+
+
+        scrollPaneProcess.setContent(null);
+        scrollPaneDone.setContent(null);
+        scrollPaneProcess.setContent(
+                getOrdersVboxForOrderTable(
+                        OrdersJson.getCategoryFromJson(OrdersJson.inProcessKey), false, lookOrderPane,
+                        orderNumText, doneBtn, addressField, priceField, positions
+                )
+        );
+        scrollPaneDone.setContent(
+                getOrdersVboxForOrderTable(
+                        OrdersJson.getCategoryFromJson(OrdersJson.readyKey), true, lookOrderPane, orderNumText,
+                        doneBtn, addressField, priceField, positions
                 )
         );
     }
 
-    private static VBox getOrdersVboxForKitchen(JSONObject jsonCategory, boolean closeable, AnchorPane lookOrderPane,
-                                                TextField orderNumText, Button doneBtn, TextField addressField,
-                                                TextField priceField, ScrollPane positionsScrollPane) {
+    private static VBox getOrdersVboxForOrderTable(JSONObject jsonCategory, boolean closeable, AnchorPane lookOrderPane,
+                                                   TextField orderNumText, Button doneBtn, TextField addressField,
+                                                   TextField priceField, ScrollPane positionsScrollPane) {
         VBox clickableList = new VBox();
         clickableList.setPadding(new Insets(10, 10, 10, 10));
         clickableList.setSpacing(10);
@@ -219,6 +251,69 @@ public class ControlHelper {
                         }
                 );
                 clickableList.getChildren().add(clickablePosition);
+            }
+            return clickableList;
+        } finally {
+            System.gc();
+        }
+    }
+
+    public static void initAndFillActiveOrderInKitchen(ScrollPane ordersPane, TextField orderNum, TextField orderAddress,
+                                                       ScrollPane positionsPane) {
+        map4fillingOrders = null;
+        map4fillingOrders = new HashMap<>();
+        map4fillingOrders.put("ordersPane", ordersPane);
+        map4fillingOrders.put("orderNum", orderNum);
+        map4fillingOrders.put("orderAddress", orderAddress);
+        map4fillingOrders.put("positionsPane", positionsPane);
+        fillActiveOrderInKitchen();
+    }
+
+    public static void fillActiveOrderInKitchen() {
+        ScrollPane ordersPane = (ScrollPane) map4fillingOrders.get("ordersPane");
+        ordersPane.setContent(null);
+        ScrollPane positionsPane = (ScrollPane) map4fillingOrders.get("positionsPane");
+        TextField orderAddress = (TextField) map4fillingOrders.get("orderAddress");
+        TextField orderNum = (TextField) map4fillingOrders.get("orderNum");
+        ordersPane.setContent(
+                getOrdersVboxForOrderKitchen(orderNum, orderAddress, positionsPane)
+        );
+    }
+
+    private static VBox getOrdersVboxForOrderKitchen(TextField orderNum, TextField orderAddress,
+                                                     ScrollPane positionsPane) {
+        VBox clickableList = new VBox();
+        clickableList.setPadding(new Insets(10, 10, 10, 10));
+        clickableList.setSpacing(10);
+        clickableList.getChildren().clear();
+        JSONObject jsonCategory = OrdersJson.getCategoryFromJson(OrdersJson.inProcessKey);
+
+        try {
+            for (String num : jsonCategory.keySet()) {
+                System.out.println(num);
+                AnchorPane clickableOrder = new AnchorPane();
+                clickableOrder.setPrefSize(125, 30);
+                clickableOrder.setStyle("-fx-border-color: black; -fx-background-color: #fffdb8;");
+
+                final JSONObject order = (JSONObject) jsonCategory.get(num);
+                final String address = (String) order.get(Order.keyAddress);
+                final JSONArray positions = (JSONArray) order.get(Order.keyPositions);
+
+                Label orderLabel = new Label("     " + num);
+                orderLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333;");
+
+                clickableOrder.getChildren().add(orderLabel);
+                clickableOrder.setOnMouseClicked(e ->
+                        {
+                            orderNum.setText(num);
+                            orderAddress.setText(address);
+                            positionsPane.setContent(null);
+                            positionsPane.setContent(
+                                    getPositionsInKitchen(positions)
+                            );
+                        }
+                );
+                clickableList.getChildren().add(clickableOrder);
             }
             return clickableList;
         } finally {
@@ -294,5 +389,49 @@ public class ControlHelper {
         } finally {
             System.gc();
         }
+    }
+
+    private static VBox getPositionsInKitchen(JSONArray positions) {
+        try {
+            VBox clickableList = new VBox();
+            clickableList.setPadding(new Insets(10, 10, 10, 10));
+            clickableList.setSpacing(10);
+            clickableList.getChildren().clear();
+
+            for (Object position : positions) {
+                AnchorPane positionLine = new AnchorPane();
+                positionLine.setPrefSize(500, 30);
+                positionLine.setStyle("-fx-border-color: black; -fx-background-color: #fffdb8;");
+                JSONObject workablePosition = (JSONObject) position;
+
+                final String positionInfo = "     " + workablePosition.get(Order.keyName) + "  |  Кол-во: " + workablePosition.get(Order.keyScore);
+
+                Label positionLabel = new Label(positionInfo);
+                positionLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333;");
+                positionLine.getChildren().add(positionLabel);
+                clickableList.getChildren().add(positionLine);
+            }
+            return clickableList;
+        } finally {
+            System.gc();
+        }
+    }
+
+    public static void showNotification(AnchorPane notePane, Text noteText, final String text) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                notePane.setVisible(true);
+                noteText.setText(text);
+                Thread.sleep(5000);
+                notePane.setVisible(false);
+                return null;
+            }
+        };
+
+        Thread thread = new Thread(task);
+        thread.setName("Show notification");
+        thread.setDaemon(true);
+        thread.start();
     }
 }

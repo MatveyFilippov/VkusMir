@@ -50,13 +50,12 @@
       <AnchorPane fx:id="mainKitchenPane" prefHeight="550.0" prefWidth="800.0" visible="false">
          <children>
             <ScrollPane fx:id="orderNumbersKitchen" layoutX="24.0" layoutY="86.0" prefHeight="449.0" prefWidth="150.0" />
-            <Button layoutX="40.0" layoutY="27.0" mnemonicParsing="false" onAction="#openStartPaneFromMainKitchen" prefHeight="38.0" prefWidth="118.0" text="Завершить" />
             <Text layoutX="355.0" layoutY="60.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Кухня" textAlignment="CENTER">
                <font>
                   <Font size="39.0" />
                </font>
             </Text>
-            <ScrollPane layoutX="190.0" layoutY="145.0" prefHeight="390.0" prefWidth="595.0" />
+            <ScrollPane fx:id="orderPositionsKitchen" layoutX="190.0" layoutY="145.0" prefHeight="390.0" prefWidth="595.0" />
             <Text layoutX="535.0" layoutY="134.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Заказ №">
                <font>
                   <Font size="20.0" />
@@ -67,14 +66,14 @@
                   <Font size="20.0" />
                </font>
             </Text>
-            <TextField editable="false" layoutX="621.0" layoutY="113.0" prefHeight="26.0" prefWidth="99.0" promptText="номер заказа" />
-            <TextField editable="false" layoutX="264.0" layoutY="113.0" prefHeight="26.0" prefWidth="265.0" promptText="адрес" />
-            <Button layoutX="726.0" layoutY="113.0" mnemonicParsing="false" text="ГОТОВ" textFill="#35592d" />
+            <TextField fx:id="orderNumKitchen" editable="false" layoutX="621.0" layoutY="113.0" prefHeight="26.0" prefWidth="99.0" promptText="номер заказа" />
+            <TextField fx:id="orderAddressKitchen" editable="false" layoutX="264.0" layoutY="113.0" prefHeight="26.0" prefWidth="265.0" promptText="адрес" />
+            <Button layoutX="726.0" layoutY="113.0" mnemonicParsing="false" onAction="#doneOrderBtn" text="ГОТОВ" textFill="#35592d" />
+            <Button layoutX="62.0" layoutY="32.0" mnemonicParsing="false" onAction="#refreshOrdersScrollPane" text="Обновить" />
          </children>
       </AnchorPane>
       <AnchorPane fx:id="mainOrderPane" prefHeight="550.0" prefWidth="800.0" visible="false">
          <children>
-            <Button layoutX="39.0" layoutY="26.0" mnemonicParsing="false" onAction="#openStartPaneFromMainOrder" prefHeight="38.0" prefWidth="73.0" text="Назад" />
             <Button defaultButton="true" layoutX="597.0" layoutY="29.0" mnemonicParsing="false" onAction="#openOrderPaneFromMainOrder" prefHeight="71.0" prefWidth="156.0" text="Новый заказ">
                <font>
                   <Font name="Damascus Regular" size="21.0" />
@@ -98,6 +97,7 @@
                   <Font size="16.0" />
                </font>
             </Text>
+            <Button layoutX="40.0" layoutY="33.0" mnemonicParsing="false" onAction="#refreshOrdersScrollPane" prefHeight="26.0" prefWidth="147.0" text="Обновить" />
          </children>
       </AnchorPane>
       <AnchorPane fx:id="orderCategoriesPane" prefHeight="550.0" prefWidth="800.0" visible="false">
@@ -293,7 +293,7 @@
                </font>
             </Text>
             <ScrollPane fx:id="orderPositionsInKitchenLook" layoutX="11.0" layoutY="125.0" prefHeight="390.0" prefWidth="751.0" />
-            <Button fx:id="orderIsDoneKitchenLook" disable="true" layoutX="655.0" layoutY="16.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="78.0" text="Выдан" textFill="#3b680b">
+            <Button fx:id="orderIsDoneKitchenLook" disable="true" layoutX="655.0" layoutY="16.0" mnemonicParsing="false" onAction="#orderIsDoneOrderTable" prefHeight="35.0" prefWidth="78.0" text="Выдан" textFill="#3b680b">
                <font>
                   <Font size="17.0" />
                </font>
@@ -373,6 +373,15 @@
          </children>
       </AnchorPane>
       <AnchorPane fx:id="virtualKeyboardPane" layoutX="12.0" layoutY="274.0" prefHeight="260.0" prefWidth="777.0" style="-fx-background-color: #d3e7e8;" visible="false" />
+      <AnchorPane fx:id="notificationPane" layoutX="18.0" layoutY="14.0" onMouseClicked="#closeNotification" prefHeight="41.0" prefWidth="764.0" style="-fx-background-color: #d0e8b0;" visible="false">
+         <children>
+            <Text fx:id="notificationText" layoutX="14.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Текст уведомления" textAlignment="CENTER" wrappingWidth="736.49609375">
+               <font>
+                  <Font size="23.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
       <AnchorPane fx:id="errorPane" layoutX="200.0" layoutY="125.0" prefHeight="300.0" prefWidth="400.0" style="-fx-background-color: #ffd0d1; -fx-border-color: #000;" visible="false">
          <children>
             <Text layoutX="151.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ОШИБКА!">

@@ -1,5 +1,7 @@
 package homer.vkusmir;
 
+import javafx.fxml.FXML;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -55,7 +57,7 @@ public class Order {
         Map<String, Object> data = new HashMap<>();
         data.put(keyPositions, orderList);
         data.put(keyAddress, address);
-        data.put(keyNumber, orderNum);
+        data.put(keyNumber, String.valueOf(orderNum));
         data.put(keyOrderPrice, finalPrice.toString());
         Corridor2Talk.sendOrder(data);
         OrdersJson.appendNewOrder(data);

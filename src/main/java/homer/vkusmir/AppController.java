@@ -3,7 +3,6 @@ package homer.vkusmir;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -21,13 +20,13 @@ public class AppController {
     private AnchorPane orderProductsListPane, sure2dellProductPane, addProductInOrderPane, endOrderPane, virtualKeyboardPane;
 
     @FXML
-    private AnchorPane sure2DellPositionPane, lookWrittenOrderPane;
+    private AnchorPane sure2DellPositionPane, lookWrittenOrderPane, notificationPane;
 
     @FXML
     private Text categoryNameInProductList, typeOfProductInAddOrder, priceOfProductInAddOrder, finalPriceInEndOrder;
 
     @FXML
-    private Text yesDellPositionInOrder;
+    private Text yesDellPositionInOrder, notificationText;
 
     @FXML
     private TextArea errorTextArea;
@@ -36,7 +35,7 @@ public class AppController {
     private ScrollPane scrollPane4Products, scrollPane4ActualOrderTable, scrollPane4DoneOrderTable, scrollPane4EndOrder;
 
     @FXML
-    private ScrollPane orderPositionsInKitchenLook, orderNumbersKitchen;
+    private ScrollPane orderPositionsInKitchenLook, orderNumbersKitchen, orderPositionsKitchen;
 
     @FXML
     private TextField createProductNameTextField, createProductPriceTextField, name2addInOrderTextField;
@@ -45,10 +44,10 @@ public class AppController {
     private TextField price2dellTextField, name2dellTextField, type2dellTextField, category2dellTextField;
 
     @FXML
-    private TextField price2addInOrderTextField, score2addInOrderTextField, deliveryAddressInEndOrder;
+    private TextField price2addInOrderTextField, score2addInOrderTextField, deliveryAddressInEndOrder, orderNumKitchen;
 
     @FXML
-    private TextField addressInDoneOrder, position2dellTextField, orderNumInKitchenLook, priceInDoneOrder;
+    private TextField addressInDoneOrder, position2dellTextField, orderNumInKitchenLook, priceInDoneOrder, orderAddressKitchen;
 
     @FXML
     private MenuButton newProductCategoryMenuBtn, newProductTypeMenuBtn;
@@ -61,13 +60,18 @@ public class AppController {
 
     private final VirtualKeyboard virtualKB = new VirtualKeyboard();
     private Map<String, Map<String, VBox>> vboxes = new HashMap<>();
+    private boolean isKitchenOpen = false;
 
 
     @FXML
-    void openMainKitchenPaneFromStart(MouseEvent event) throws IOException {
+    void openMainKitchenPaneFromStart() throws IOException {
         try {
-            Corridor2Talk.initKitchen(errorPane, errorTextArea, orderNumbersKitchen);
+            Corridor2Talk.initKitchen(errorPane, errorTextArea, notificationText, notificationPane);
+            ControlHelper.initAndFillActiveOrderInKitchen(
+                    orderNumbersKitchen, orderNumKitchen, orderAddressKitchen, orderPositionsKitchen
+            );
             ControlHelper.switchPane(mainStartPane, mainKitchenPane);
+            isKitchenOpen = true;
         } catch (IOException ex) {
             ControlHelper.printErrorInApp(errorPane, errorTextArea,
                     "Не могу запустить кухню\nОшибка запуска сервера\nAppController.java :: openMainKitchenPaneFromStart()");
@@ -76,7 +80,7 @@ public class AppController {
     }
 
     @FXML
-    void openMainOrderPainFromOrder(ActionEvent event) {  // TODO: если есть ордер, то переспросить
+    void openMainOrderPainFromOrder() {  // TODO: если есть ордер, то переспросить
         Order.killOrder();
         btnCheckDeliveryInEndOrder.setSelected(false);
         btnDeliveryInEndOrder();
@@ -86,14 +90,14 @@ public class AppController {
     @FXML
     void openMainOrderPaneFromStart() throws IOException {
         try {
-            Corridor2Talk.initOrderTable(scrollPane4ActualOrderTable, errorPane, errorTextArea);
-            ControlHelper.fillOrdersVboxForKitchen(
-                    lookWrittenOrderPane, scrollPane4ActualOrderTable, OrdersJson.inProcessKey, false,
-                    orderNumInKitchenLook, orderIsDoneKitchenLook, addressInDoneOrder, priceInDoneOrder,
-                    orderPositionsInKitchenLook
+            Corridor2Talk.initOrderTable(errorPane, errorTextArea, notificationText, notificationPane);
+            ControlHelper.initAndFillOrdersVboxForOrderTable(
+                    lookWrittenOrderPane, scrollPane4ActualOrderTable, scrollPane4DoneOrderTable, orderNumInKitchenLook,
+                    orderIsDoneKitchenLook, addressInDoneOrder, priceInDoneOrder, orderPositionsInKitchenLook
             );
             virtualKB.initKeyboardForSimpleUsing(virtualKeyboardPane);
             ControlHelper.switchPane(mainStartPane, mainOrderPane);
+            isKitchenOpen = false;
         } catch (Exception ex) {
             ControlHelper.printErrorInApp(errorPane, errorTextArea,
                     "Не могу подключиться к кухне\nОшибка подключения к серверу\nAppController.java :: openMainOrderPaneFromStart()");
@@ -108,19 +112,7 @@ public class AppController {
     }
 
     @FXML
-    void openStartPaneFromMainOrder(ActionEvent event) {
-        Corridor2Talk.killOrderTable();
-        ControlHelper.switchPane(mainOrderPane, mainStartPane);
-    }
-
-    @FXML
-    void openStartPaneFromMainKitchen(ActionEvent event) {
-        Corridor2Talk.killKitchen();
-        ControlHelper.switchPane(mainKitchenPane, mainStartPane);
-    }
-
-    @FXML
-    void runSecretTask(MouseEvent event) {
+    void runSecretTask() {
         if (ControlHelper.isClickedFiveTimes()) {
             ControlHelper.alreadyGetLog = true;
             System.out.println("Выполнил секретное задание!");  // TODO: create some secret task
@@ -190,12 +182,12 @@ public class AppController {
     }
 
     @FXML
-    void openEditMenuPaneFromMainOrder(ActionEvent event) {
+    void openEditMenuPaneFromMainOrder() {
         ControlHelper.switchPane(mainOrderPane, editMenuPane);
     }
 
     @FXML
-    void openCategoriesPaneFromEditMenu(ActionEvent event) {
+    void openCategoriesPaneFromEditMenu() {
         virtualKB.hideKB();
         newProductTypeMenuBtn.setText("Тип");
         newProductCategoryMenuBtn.setText("Категория");
@@ -231,7 +223,7 @@ public class AppController {
     }
 
     @FXML
-    void createProductButton(ActionEvent event) throws IOException {
+    void createProductButton() throws IOException {
         virtualKB.hideKB();
         if (NewProduct.isAllField(errorPane, errorTextArea, createProductPriceTextField, createProductNameTextField)) {
             NewProduct.putProductInBase();
@@ -327,7 +319,7 @@ public class AppController {
     }
 
     @FXML
-    void addProductInOrderProductBtn(ActionEvent event) {
+    void addProductInOrderProductBtn() {
         String productScore = score2addInOrderTextField.getText();
         if (productScore.isEmpty()) {
             ControlHelper.printErrorInApp(
@@ -447,11 +439,53 @@ public class AppController {
         }
         endOrderPane.setVisible(false);
         ControlHelper.switchPane(orderCategoriesPane, mainOrderPane);
-        ControlHelper.fillOrdersVboxForKitchen(
-                lookWrittenOrderPane, scrollPane4ActualOrderTable, OrdersJson.inProcessKey, false,
-                orderNumInKitchenLook, orderIsDoneKitchenLook, addressInDoneOrder, priceInDoneOrder,
-                orderPositionsInKitchenLook
-        );
+        ControlHelper.fillOrdersVboxForOrderTable();
         scrollPane4EndOrder.setContent(null);
+    }
+
+    @FXML
+    void doneOrderBtn() {
+        String orderNum = orderNumKitchen.getText();
+        try {
+            if (!orderNum.isEmpty()) {
+                Corridor2Talk.sendDoneOrder(Integer.parseInt(orderNum));
+                OrdersJson.dellOrder(OrdersJson.inProcessKey, orderNum);
+                ControlHelper.fillActiveOrderInKitchen();
+                ControlHelper.showNotification(notificationPane, notificationText,
+                        "Заказ " + orderNum + " выполнен"
+                );
+            } else {
+                throw new Exception("can't end order in kitchen");
+            }
+        } catch (Exception ex) {
+            ControlHelper.printErrorInApp(errorPane, errorTextArea,
+                    "Не могу завершить заказ\nAppController.java : doneOrderBtn()"
+            );
+        }
+    }
+
+    @FXML
+    void closeNotification() {
+        notificationPane.setVisible(false);
+        if (isKitchenOpen) {
+            ControlHelper.fillActiveOrderInKitchen();
+        } else {
+            ControlHelper.fillOrdersVboxForOrderTable();
+        }
+    }
+
+    @FXML
+    void refreshOrdersScrollPane() {
+        if (isKitchenOpen) {
+            ControlHelper.fillActiveOrderInKitchen();
+        } else {
+            ControlHelper.fillOrdersVboxForOrderTable();
+        }
+    }
+
+    @FXML
+    void orderIsDoneOrderTable() throws IOException {
+        OrdersJson.dellOrder(OrdersJson.readyKey, orderNumInKitchenLook.getText());
+        ControlHelper.fillOrdersVboxForOrderTable();
     }
 }
