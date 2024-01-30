@@ -4,17 +4,13 @@ import javafx.concurrent.Task;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
-public class Corridor2Talk {
+public class Corridor2Talk {  // TODO: беда со связью при отключении одного, нужно бы решить
     private static final int port = 1212;
     private static Thread listenOrdersThread = null;
     private static Thread listenDoneOrdersThread = null;
@@ -25,7 +21,19 @@ public class Corridor2Talk {
     private static TextArea errTextArea;
     private static final ArrayList<String> ips = VkusMirConfig.getIpsList();
 
-    public static void initKitchen(AnchorPane errorPane, TextArea errorTextArea) throws IOException {
+    private static Socket getClientSocket4Kitchen() throws IOException {
+        for (String host : ips) {
+            try {
+                return new Socket(host, port);
+            } catch (IOException ex) {
+                // pass
+            }
+        }
+        throw new IOException("can't connect to kitchen in 'Corridor2Talk.java :: initOrderTable()'");
+    }
+
+    public static void initKitchen(AnchorPane errorPane, TextArea errorTextArea, ScrollPane activeOrdersPane) throws IOException {
+        activeOrders = activeOrdersPane;
         serverSocket = new ServerSocket(port);
         errPane = errorPane;
         errTextArea = errorTextArea;
@@ -41,25 +49,14 @@ public class Corridor2Talk {
         } catch (Exception ex) {
             // pass
         }
+        System.gc();
     }
 
     public static void initOrderTable(ScrollPane activeOrdersPane, AnchorPane errorPane, TextArea errorTextArea) throws IOException {
         activeOrders = activeOrdersPane;
         errPane = errorPane;
         errTextArea = errorTextArea;
-        boolean isConnected = false;
-        for (String host : ips) {
-            try {
-                clientSocket = new Socket(host, port);
-                isConnected = true;
-                break;
-            } catch (IOException ex) {
-                // pass
-            }
-        }
-        if (!isConnected) {
-            throw new IOException("can't connect to kitchen in 'Corridor2Talk.java :: initOrderTable()'");
-        }
+        clientSocket = getClientSocket4Kitchen();
         startWaitingDoneOrders();
     }
 
@@ -72,6 +69,7 @@ public class Corridor2Talk {
         } catch (Exception ex) {
             // pass
         }
+        System.gc();
     }
 
     public static void sendDoneOrder(int orderNumber) {
@@ -84,7 +82,7 @@ public class Corridor2Talk {
                     dataOutputStream.writeUTF(String.valueOf(orderNumber));
                 } catch (IOException ex) {
                     ControlHelper.printErrorInApp(errPane, errTextArea,
-                            "Возможно стол заказов не включен, ведь я не могу отправить выполненный заказ (нет клиента)\nCorridor2Talk.java :: sendDoneOrder()");
+                            "Возможно стол заказов не включен, ведь я не могу отправить выполненный заказ\nCorridor2Talk.java :: sendDoneOrder()");
                     throw new IOException("can't send done order in 'Corridor2Talk.java :: sendDoneOrder()'");
                 }
                 return null;
@@ -106,10 +104,13 @@ public class Corridor2Talk {
             @Override
             protected Void call() throws Exception {
                 try {
+                    if (!clientSocket.isConnected()) {
+                        throw new IOException("connection with kitchen is lost");
+                    }
                     OutputStream outputStream = clientSocket.getOutputStream();
                     ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
                     objectOutputStream.writeObject(orderMap);
-                } catch (IOException ex) {
+                } catch (Exception ex) {
                     ControlHelper.printErrorInApp(errPane, errTextArea,
                             "Возможно кухня не включена, ведь я не могу отправить заказ (нет сервера)\nCorridor2Talk.java :: sendOrder()");
                     throw new IOException("can't send order in 'Corridor2Talk.java :: sendOrder()'");
@@ -159,44 +160,55 @@ public class Corridor2Talk {
     }
 
     private static void waitOrders() throws IOException {
-        clientSocket = serverSocket.accept();
         while (true) {
-            if (listenOrdersThread.isInterrupted()) {
+            clientSocket = serverSocket.accept();
+            while (true) {
+                try {
+                    InputStream inputStream = clientSocket.getInputStream();
+                    ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+
+                    Map<String, Object> orderMap = (Map<String, Object>) objectInputStream.readObject();
+                    loadOrder(orderMap);
+                } catch (IOException | ClassNotFoundException ex) {
+                    break;
+                }
+            }
+            if (listenOrdersThread.isInterrupted() || serverSocket.isClosed()) {
                 listenOrdersThread = null;
                 return;
-            }
-            try {
-                InputStream inputStream = clientSocket.getInputStream();
-                ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-
-                Map<String, Object> orderMap = (Map<String, Object>) objectInputStream.readObject();
-                loadOrder(orderMap);
-            } catch (IOException | ClassNotFoundException ex) {
-                // pass
             }
         }
     }
 
     private static void waitDoneOrders() throws IOException {
         while (true) {
+            clientSocket = getClientSocket4Kitchen();
+            while (true) {
+                try {
+                    InputStream inputStream = clientSocket.getInputStream();
+                    DataInputStream dataInputStream = new DataInputStream(inputStream);
+
+                    String receivedOrderNum = dataInputStream.readUTF();
+                    loadDoneOrder(receivedOrderNum);
+                } catch (IOException ex) {
+                    if (listenDoneOrdersThread.isInterrupted()) {
+                        listenDoneOrdersThread = null;
+                        return;
+                    }
+                    ControlHelper.printErrorInApp(errPane, errTextArea,
+                            "Возможно кухня выключена (если нет, то перезапустите приложение)\nОшибка со связью\nCorridor2Talk.java :: waitDoneOrders()");
+                    break;
+                }
+            }
             if (listenDoneOrdersThread.isInterrupted()) {
                 listenDoneOrdersThread = null;
                 return;
-            }
-            try {
-                InputStream inputStream = clientSocket.getInputStream();
-                DataInputStream dataInputStream = new DataInputStream(inputStream);
-
-                String receivedOrderNum = dataInputStream.readUTF();
-                loadDoneOrder(receivedOrderNum);
-            } catch (IOException ex) {
-                // pass
             }
         }
     }
 
     private static void loadOrder(Map<String, Object>  order) {
-        // TODO: вставить обработку
+        System.out.println(order);
     }
 
     private static void loadDoneOrder(String doneOrderNum) {

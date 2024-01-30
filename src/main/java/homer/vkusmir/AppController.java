@@ -36,7 +36,7 @@ public class AppController {
     private ScrollPane scrollPane4Products, scrollPane4ActualOrderTable, scrollPane4DoneOrderTable, scrollPane4EndOrder;
 
     @FXML
-    private ScrollPane orderPositionsInKitchenLook;
+    private ScrollPane orderPositionsInKitchenLook, orderNumbersKitchen;
 
     @FXML
     private TextField createProductNameTextField, createProductPriceTextField, name2addInOrderTextField;
@@ -66,7 +66,7 @@ public class AppController {
     @FXML
     void openMainKitchenPaneFromStart(MouseEvent event) throws IOException {
         try {
-            Corridor2Talk.initKitchen(errorPane, errorTextArea);
+            Corridor2Talk.initKitchen(errorPane, errorTextArea, orderNumbersKitchen);
             ControlHelper.switchPane(mainStartPane, mainKitchenPane);
         } catch (IOException ex) {
             ControlHelper.printErrorInApp(errorPane, errorTextArea,
@@ -86,14 +86,7 @@ public class AppController {
     @FXML
     void openMainOrderPaneFromStart() throws IOException {
         try {
-            // Corridor2Talk.initOrderTable(scrollPane4ActualOrderTable, errorPane, errorTextArea);  // TODO: paste
-//            while (true) {
-//                ControlHelper.fillOrdersVboxForKitchen(scrollPane4ActualOrderTable, OrdersJson.inProcessKey, false);
-//                fillListWithProducts2Dell(ProductsJson.grillCategoryFood);
-//                fillListWithProductsInOrder(ProductsJson.breadCategoryFood);
-//                fillListWithProducts2Dell(ProductsJson.meetCategoryFood);
-//                fillListWithProductsInOrder(ProductsJson.miscCategoryFood);
-//            }
+            Corridor2Talk.initOrderTable(scrollPane4ActualOrderTable, errorPane, errorTextArea);
             ControlHelper.fillOrdersVboxForKitchen(
                     lookWrittenOrderPane, scrollPane4ActualOrderTable, OrdersJson.inProcessKey, false,
                     orderNumInKitchenLook, orderIsDoneKitchenLook, addressInDoneOrder, priceInDoneOrder,
@@ -101,7 +94,7 @@ public class AppController {
             );
             virtualKB.initKeyboardForSimpleUsing(virtualKeyboardPane);
             ControlHelper.switchPane(mainStartPane, mainOrderPane);
-        } catch (Exception ex) {  // IOException ex
+        } catch (Exception ex) {
             ControlHelper.printErrorInApp(errorPane, errorTextArea,
                     "Не могу подключиться к кухне\nОшибка подключения к серверу\nAppController.java :: openMainOrderPaneFromStart()");
             throw new IOException(ex);

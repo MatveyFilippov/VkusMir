@@ -49,7 +49,7 @@
          </children></AnchorPane>
       <AnchorPane fx:id="mainKitchenPane" prefHeight="550.0" prefWidth="800.0" visible="false">
          <children>
-            <ScrollPane layoutX="24.0" layoutY="86.0" prefHeight="449.0" prefWidth="150.0" />
+            <ScrollPane fx:id="orderNumbersKitchen" layoutX="24.0" layoutY="86.0" prefHeight="449.0" prefWidth="150.0" />
             <Button layoutX="40.0" layoutY="27.0" mnemonicParsing="false" onAction="#openStartPaneFromMainKitchen" prefHeight="38.0" prefWidth="118.0" text="Завершить" />
             <Text layoutX="355.0" layoutY="60.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Кухня" textAlignment="CENTER">
                <font>
